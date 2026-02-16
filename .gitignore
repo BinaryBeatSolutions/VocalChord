@@ -1,0 +1,11 @@
+[Bb]in/
+[Oo]bj/
+*.user
+*.suo
+*.sln.docstates
+.vs
+.git
+
+# AI Modeller (Viktigt!)
+Models/*.bin
+Models/*.ggml
