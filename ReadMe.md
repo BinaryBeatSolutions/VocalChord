@@ -1,6 +1,6 @@
-﻿# Binarybeat solution
+﻿# VocalChord by BinaryBeat solution
 
-## Binarybeat description
+## VocalChord by Binarybeat description
 Binarybeat is a plugin for Abelton or other DAWs that allows you to create chords using your voice only. It is designed to be simple and intuitive, making it easy for anyone to create complex chords in a seemless way.
 
 
@@ -10,7 +10,7 @@ Binarybeat is a plugin for Abelton or other DAWs that allows you to create chord
 - **Audio Stack:** NAudio for high-performance PCM stream capturing.
 - **Pattern Matching:** Fuzzy logic implementation to map natural language to musical theory (Chords).
 - **Deployment:** Compiled using **Native AOT** for minimal footprint and maximum performance in a production environment.
-- BinaryBeat utilizes quantized GGML models (Base/Tiny) to ensure high-performance inference on standard CPUs without requiring a dedicated GPU."
+- VocalChord utilizes quantized GGML models (Base/Tiny) to ensure high-performance inference on standard CPUs without requiring a dedicated GPU."
 
 # BinaryBeat Library
 A high-performance .NET 8 library for real-time AI voice-to-midi processing.
@@ -25,11 +25,11 @@ Designed to be embedded into VST3/AU plugins or standalone DAWs.
 Core innehåller de gränssnitt (Interfaces) och modeller som definierar flödet.
 
 ### Domain
-Domain innehåller reglerna för Musik. Här bor logiken för ackord, skalor och hur BinaryBeat tolkar kommandon.
+Domain contains rules for musik. The logic for chords, sclaes and how VocalChord translates commands.
 
 
 ### Infrastructure
-Infrastructure-lagret ansvarar för teknisk implementering och kommunikation med hårdvara eller externa bibliotek. Det är "musklerna" som utför det Core och Domain planerar.
+Infrastructure-layes responsible for the technical implementation communication with ghardware and/or an external library.
 
 Innehåll:
 AI Engine Implementation: Här lever den konkreta integrationen med Whisper.net. Den hanterar laddning av modellfiler (.bin) och omvandlar råa ljudvågor till textsträngar med hjälp av lokal maskininlärning.
