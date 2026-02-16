@@ -1,10 +1,10 @@
-﻿# VocalChord by BinaryBeat solution
+﻿# VocalChord (by BinaryBeat Solutions)
 
-## VocalChord by Binarybeat description
-Binarybeat is a plugin for Abelton or other DAWs that allows you to create chords using your voice only. It is designed to be simple and intuitive, making it easy for anyone to create complex chords in a seemless way.
+## VocalChord description
+VocalHord is a plugin (VST3) for Abelton or other DAWs that allows you to create chords using your voice only. It is designed to be simple and intuitive, making it easy for anyone to create complex chords in a seemless way.
 
 
-## Technical Architecture
+## VocalChord technical architecture
 - **Engine:** .NET 8 LTS (Long Term Support) for enterprise stability.
 - **AI Core:** Local LLM/Whisper integration via `Whisper.net` for zero-latency and total privacy (no cloud dependency).
 - **Audio Stack:** NAudio for high-performance PCM stream capturing.
@@ -12,7 +12,7 @@ Binarybeat is a plugin for Abelton or other DAWs that allows you to create chord
 - **Deployment:** Compiled using **Native AOT** for minimal footprint and maximum performance in a production environment.
 - VocalChord utilizes quantized GGML models (Base/Tiny) to ensure high-performance inference on standard CPUs without requiring a dedicated GPU."
 
-# BinaryBeat Library
+# VocalHord Library
 A high-performance .NET 8 library for real-time AI voice-to-midi processing.
 
 ## Integration
@@ -22,14 +22,14 @@ Designed to be embedded into VST3/AU plugins or standalone DAWs.
 
 
 ### Core
-Core innehåller de gränssnitt (Interfaces) och modeller som definierar flödet.
+Core contains core the structure such as models and interfaces.
 
 ### Domain
-Domain contains rules for musik. The logic for chords, sclaes and how VocalChord translates commands.
+Domain contains rules for music. The logic for chords, sclaes and how VocalChord translates commands.
 
 
 ### Infrastructure
-Infrastructure-layes responsible for the technical implementation communication with ghardware and/or an external library.
+Infrastructure-layes responsible for the technical implementation communication with hardware and/or an external library.
 
 Innehåll:
 AI Engine Implementation: Här lever den konkreta integrationen med Whisper.net. Den hanterar laddning av modellfiler (.bin) och omvandlar råa ljudvågor till textsträngar med hjälp av lokal maskininlärning.
