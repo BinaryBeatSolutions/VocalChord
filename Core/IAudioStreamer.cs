@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 namespace BinaryBeat.Core
 {
     
-
     public interface IAudioStreamer
     {
       

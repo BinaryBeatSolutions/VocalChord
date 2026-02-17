@@ -1,36 +1,35 @@
 ﻿using BinaryBeat.Domain.Models;
 using FuzzySharp;
 
-namespace BinaryBeat.Domain
+namespace BinaryBeat.Domain;
+
+public class ChordMapper
 {
-    public class ChordMapper
+    private readonly Dictionary<string, int[]> _chordDictionary = new()
     {
-        private readonly Dictionary<string, int[]> _chordDictionary = new()
+        { "C Major", new[] { 60, 64, 67 } },
+        { "A Minor", new[] { 57, 60, 64 } },
+        { "G Major", new[] { 55, 59, 62 } }
+    };
+
+    public MusicalChord? MapToChord(string input, float confidence)
+    {
+        // Bibliotek med ackord (skulle kunna ligga i en JSON-fil senare) eller låta AI generera alla kombinationer
+        var library = new Dictionary<string, int[]>
         {
-            { "C Major", new[] { 60, 64, 67 } },
-            { "A Minor", new[] { 57, 60, 64 } },
-            { "G Major", new[] { 55, 59, 62 } }
+            { "C Major", [60, 64, 67] },
+            { "A Minor", [57, 60, 64] },
+            { "G Major", [55, 59, 62] }
         };
 
-        public MusicalChord? MapToChord(string input, float confidence)
+        // FuzzySharp finds the best match
+        var result = Process.ExtractOne(input, library.Keys);
+
+        if (result.Score > 75) // Tröskelvärde för att undvika "falska" ackord
         {
-            // Bibliotek med ackord (skulle kunna ligga i en JSON-fil senare)
-            var library = new Dictionary<string, int[]>
-            {
-                { "C Major", [60, 64, 67] },
-                { "A Minor", [57, 60, 64] },
-                { "G Major", [55, 59, 62] }
-            };
-
-            // FuzzySharp letar rätt på den bästa matchningen
-            var result = Process.ExtractOne(input, library.Keys);
-
-            if (result.Score > 75) // Tröskelvärde för att undvika "falska" ackord
-            {
-                return new MusicalChord(result.Value, library[result.Value], confidence);
-            }
-
-            return null;
+            return new MusicalChord(result.Value, library[result.Value], confidence);
         }
+
+        return null;
     }
 }

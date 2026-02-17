@@ -1,49 +1,26 @@
-﻿using BinaryBeat.Core;
-using BinaryBeat.Domain;
-using BinaryBeat.Domain.Models;
-using BinaryBeat.Infrastructure;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using System.Reflection;
+﻿
 
-// 1. Sätt upp Dependency Injection och Konfiguration
 var builder = Host.CreateApplicationBuilder(args);
+using var host = builder.ConfigureServices().Build();
 
-var _modelpath = PathResolver.GetModelPath("ggml-tiny.bin");
-
-
-// Get the directory where the executing assembly (EXE) is located
-// Registrera dina komponenter
-builder.Services.AddSingleton<ChordMapper>();
-builder.Services.AddSingleton<MidiService>();
-builder.Services.AddSingleton<IAiProcessor>(sp =>
-    new WhisperAiProcessor(_modelpath)); // Sökväg till modell
-
-// Här kan du lägga till din AudioStreamer senare
-builder.Services.AddSingleton<IAudioStreamer, NaudioStreamer>();
-
-using var host = builder.Build();
-
-// 2. Starta logiken
-Console.WriteLine("--- BinaryBeat AI Engine Starting ---");
+Console.WriteLine("--- VocalChord by BinaryBeat AI Engine Starting ---");
 
 var aiProcessor = host.Services.GetRequiredService<IAiProcessor>() as WhisperAiProcessor;
-if (aiProcessor != null)
-{
-    await aiProcessor.InitializeAsync();
-}
-
 var midiService = host.Services.GetRequiredService<MidiService>();
 var mapper = host.Services.GetRequiredService<ChordMapper>();
 var streamer = host.Services.GetRequiredService<IAudioStreamer>();
 
+if (aiProcessor != null) await aiProcessor.InitializeAsync();
+
 midiService.Initialize();
 
-Console.WriteLine(">>> BinaryBeat lyssnar nu. Säg ett ackord (t.ex. 'C Major')...");
+
+Console.WriteLine(">>> BinaryBeat is listening. Say a chord (for.eg. 'C Major')...");
+
 
 using var liveCts = new CancellationTokenSource();
 
-// Vi använder en enkel lista för att ackumulera ljud (buffring)
+// Enkel lista för att ackumulera ljud (buffring)
 var pcmBuffer = new List<byte>();
 
 MusicalChord? lastChord = null;
@@ -52,7 +29,7 @@ await foreach (var audioChunk in streamer.StreamAudioAsync(liveCts.Token))
 {
     pcmBuffer.AddRange(audioChunk);
 
-    if (pcmBuffer.Count >= 48000)
+    if (pcmBuffer.Count >= 44000)
     {
         var rawData = pcmBuffer.ToArray();
         pcmBuffer.Clear();

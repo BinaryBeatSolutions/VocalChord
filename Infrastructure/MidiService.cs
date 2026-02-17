@@ -7,52 +7,37 @@ namespace BinaryBeat.Infrastructure;
 public class MidiService : IDisposable
 {
     private OutputDevice? _outputDevice;
-    private const string VirtualPortName = "BinaryBeat MIDI Out";
+    private readonly string _portName = "BinaryBeat MIDI Out";
 
     public void Initialize()
     {
-        try
-        {
-            // Vi försöker hitta en port (t.ex. skapad i loopMIDI) 
-            // eller använda Microsoft GS Wavetable som fallback för test
-            _outputDevice = OutputDevice.GetAll().FirstOrDefault(d => d.Name.Contains("loopMIDI"))
-                            ?? OutputDevice.GetAll().FirstOrDefault();
+        // Vi letar specifikt efter porten i loopMIDI
+        _outputDevice = OutputDevice.GetAll()
+            .FirstOrDefault(d => d.Name.Equals("BinaryBeat Out", StringComparison.OrdinalIgnoreCase));
 
-            if (_outputDevice != null)
-            {
-                Console.WriteLine($"[MIDI] Connected to: {_outputDevice.Name}");
-            }
-            else
-            {
-                Console.WriteLine("[MIDI] No output device found. Install loopMIDI for best results.");
-            }
-        }
-        catch (Exception ex)
+        if (_outputDevice != null)
         {
-            Console.WriteLine($"[MIDI] Initialization error: {ex.Message}");
+            Console.WriteLine($"[MIDI] Success: Connected to {_outputDevice.Name}");
+        }
+        else
+        {
+            Console.WriteLine("[MIDI] Error: 'BinaryBeat Out' not found. Is loopMIDI running?");
         }
     }
 
-    public void SendChord(int[] midiNotes, bool isOn, int velocity = 100)
+    public void SendChord(int[] notes, bool isOn)
     {
         if (_outputDevice == null) return;
 
-        foreach (var noteNumber in midiNotes)
+        foreach (var note in notes)
         {
-            // DryWetMidi använder SevenBitNumber för att garantera MIDI-standard (0-127)
-            var note = (SevenBitNumber)noteNumber;
-            var vel = (SevenBitNumber)velocity;
-
-            MidiEvent midiEvent = isOn
-                ? new NoteOnEvent(note, vel)
-                : new NoteOffEvent(note, (SevenBitNumber)0);
+            var midiEvent = isOn
+                ? (MidiEvent)new NoteOnEvent((SevenBitNumber)note, (SevenBitNumber)100)
+                : (MidiEvent)new NoteOffEvent((SevenBitNumber)note, (SevenBitNumber)0);
 
             _outputDevice.SendEvent(midiEvent);
         }
     }
 
-    public void Dispose()
-    {
-        _outputDevice?.Dispose();
-    }
+    public void Dispose() => _outputDevice?.Dispose();
 }

@@ -16,7 +16,7 @@ public class WhisperAiProcessor : IAiProcessor, IDisposable
     private readonly string _modelPath;
 
     // Default path om ingen anges
-    private static readonly string DefaultModelPath = "ggml-base.bin";
+    private static readonly string DefaultModelPath = "ggml-tiny.bin";
 
     /// <summary>
     /// 
@@ -53,10 +53,10 @@ public class WhisperAiProcessor : IAiProcessor, IDisposable
         _factory = WhisperFactory.FromPath(_modelPath);
         _processor = _factory.CreateBuilder()
             .WithLanguage("en") // Eller AutoDetectLanguage() för att låta modellen gissa språket. Det finns lite olika strategier för att styra språket.
-            .WithThreads(Environment.ProcessorCount) 
+            .WithThreads(Environment.ProcessorCount)
             .WithEntropyThreshold(0.1f)
-            .WithBeamSearchSamplingStrategy()       
-            .ParentBuilder.Build();               
+            .WithBeamSearchSamplingStrategy()
+            .ParentBuilder.Build();
 
     }
 
