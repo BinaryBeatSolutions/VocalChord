@@ -4,7 +4,7 @@ using Melanchall.DryWetMidi.Multimedia;
 
 namespace BinaryBeat.Infrastructure;
 
-public class MidiService : IDisposable
+public class MidiService : IMidiService, IDisposable
 {
     private OutputDevice? _outputDevice;
     private readonly string _portName = "BinaryBeat MIDI Out";

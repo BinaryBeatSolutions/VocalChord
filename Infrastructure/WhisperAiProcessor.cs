@@ -1,14 +1,8 @@
-﻿using BinaryBeat.Core;
-using System.Runtime.CompilerServices;
-using Whisper.net;
+﻿using Whisper.net;
 using Whisper.net.Ggml;
-using System.Linq;
 
 namespace BinaryBeat.Infrastructure;
 
-/// <summary>
-/// 
-/// </summary>
 public class WhisperAiProcessor : IAiProcessor, IDisposable
 {
     private WhisperFactory? _factory;
@@ -24,14 +18,11 @@ public class WhisperAiProcessor : IAiProcessor, IDisposable
     /// <param name="customModelPath"></param>
     public WhisperAiProcessor(string? customModelPath = null)
     {
-
         _modelPath = customModelPath ?? DefaultModelPath;
-        Console.WriteLine(_modelPath);
     }
 
     /// <summary>
-    /// Initierar motorn och laddar ner modellen om den saknas.
-    /// Bör anropas innan första körning.
+    /// Initialize the engine and downloading the model if it not exists.
     /// </summary>
     public async Task InitializeAsync()
     {
@@ -41,8 +32,9 @@ public class WhisperAiProcessor : IAiProcessor, IDisposable
             if (!string.IsNullOrEmpty(directory)) Directory.CreateDirectory(directory);
 
             Console.WriteLine($"[BinaryBeat] Downloading model to: {_modelPath}...");
+            Console.WriteLine($"[BinaryBeat] This is only done the first time if the model doesn't exists.");
 
-            // Vi använder Whisper.net:s inbyggda downloader
+            // Using Whisper.net:s builtin downloader
             using var modelStream = await WhisperGgmlDownloader.GetGgmlModelAsync(GgmlType.Base);
             using var fileStream = File.OpenWrite(_modelPath);
             await modelStream.CopyToAsync(fileStream);
@@ -52,7 +44,8 @@ public class WhisperAiProcessor : IAiProcessor, IDisposable
 
         _factory = WhisperFactory.FromPath(_modelPath);
         _processor = _factory.CreateBuilder()
-            .WithLanguage("en") // Eller AutoDetectLanguage() för att låta modellen gissa språket. Det finns lite olika strategier för att styra språket.
+            .WithLanguage("en") // Eller AutoDetectLanguage() för att låta modellen gissa språket. Det finns lite olika strategier här för att styra språket.
+            // Tex. att låta användaren välja språk, men jag tycker vi skall låta Ai ta hand om det.
             .WithThreads(Environment.ProcessorCount)
             .WithEntropyThreshold(0.1f)
             .WithBeamSearchSamplingStrategy()
@@ -69,7 +62,7 @@ public class WhisperAiProcessor : IAiProcessor, IDisposable
     /// <exception cref="InvalidOperationException"></exception>
     public async IAsyncEnumerable<SpeechResult> ProcessAudioAsync(byte[] pcmData, [EnumeratorCancellation] CancellationToken ct)
     {
-        if (_processor == null) throw new InvalidOperationException("Processor not initialized.");
+        if (_processor == null) throw new InvalidOperationException("[Debug] Processor not initialized.");
 
         // Konvertera PCM (short) till float samples
         var samples = new float[pcmData.Length / 2];
@@ -86,7 +79,7 @@ public class WhisperAiProcessor : IAiProcessor, IDisposable
     }
 
     /// <summary>
-    /// Dispose components to free up resources. WhisperFactory och WhisperProcessor kan använda GPU/CPU-resurser, så det är viktigt att städa upp ordentligt.
+    /// Dispose components to free up resources. WhisperFactory och WhisperProcessor kan använda mycket GPU/CPU-resurser, så det är viktigt att städa upp ordentligt.
     /// </summary>
     public void Dispose()
     {

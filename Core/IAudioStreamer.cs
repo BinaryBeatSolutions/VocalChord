@@ -1,17 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
+namespace BinaryBeat.Core;
 
-namespace BinaryBeat.Core
+public interface IAudioStreamer
 {
-    
-    public interface IAudioStreamer
-    {
-      
-        // Vi skickar ut ljudet i chunks för att hålla minnesanvändningen nere
-        IAsyncEnumerable<byte[]> StreamAudioAsync(CancellationToken ct);
-        void Stop();
-    }
+    // Vi skickar ut ljudet i chunks för att hålla minnesanvändningen nere
+   public IAsyncEnumerable<byte[]> StreamAudioAsync(CancellationToken ct);
+   public void Stop();
 }

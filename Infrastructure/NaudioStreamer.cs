@@ -1,6 +1,4 @@
 ﻿using NAudio.Wave;
-using System.Runtime.CompilerServices;
-using System.Threading.Channels;
 
 namespace BinaryBeat.Infrastructure;
 

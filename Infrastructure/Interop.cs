@@ -1,6 +1,4 @@
-﻿using System.Runtime.InteropServices;
-
-namespace BinaryBeat.Interop;
+﻿namespace BinaryBeat.Interop;
 
 /// <summary>
 /// VST3 bridge. Expose the API for the VST-host (DAW, Ableton, FL-Studio) to call into our AI-logic in C#.

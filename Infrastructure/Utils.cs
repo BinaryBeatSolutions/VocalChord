@@ -11,6 +11,7 @@ public static class Utils
     public static class PathResolver
     {
         /// <summary>
+        /// TODO: Be able to change model for more complex data
         /// Get the path to the Model
         /// </summary>
         /// <param name="modelName"></param>
@@ -34,11 +35,10 @@ public static class Utils
 
 
     /// <summary>
-    /// Noise GATE. Voice Activity Detection to remove background 
-    /// noise when below -40db to free up heavy use on the CPU
+    /// Calculate RMS value
     /// </summary>
-    /// <param name="buffer">Byte chunk array</param>
-    /// <returns>The RMS value, for eg 44000</returns>
+    /// <param name="buffer"></param>
+    /// <returns></returns>
     public static float CalculateRMS(byte[] buffer)
     {
         float sum = 0;

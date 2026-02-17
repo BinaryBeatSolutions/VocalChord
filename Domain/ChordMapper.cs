@@ -1,9 +1,8 @@
-﻿using BinaryBeat.Domain.Models;
-using FuzzySharp;
+﻿using FuzzySharp;
 
 namespace BinaryBeat.Domain;
 
-public class ChordMapper
+public class ChordMapper : IChordMapper
 {
     private readonly Dictionary<string, int[]> _chordDictionary = new()
     {
