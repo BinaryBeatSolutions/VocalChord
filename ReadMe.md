@@ -1,4 +1,4 @@
-﻿# VocalChord (by BinaryBeat Solutions)
+﻿# VocalChord by BinaryBeat Solutions
 
 ## VocalChord description
 VocalHord is a plugin (VST3) for Abelton or other DAWs that allows you to create chords using your voice only. It is designed to be simple and intuitive, making it easy for anyone to create complex chords in a seemless way.
@@ -31,8 +31,9 @@ Domain contains rules for music. The logic for chords, sclaes and how VocalChord
 ### Infrastructure
 Infrastructure-layes responsible for the technical implementation communication with hardware and/or an external library.
 
-Innehåll:
-AI Engine Implementation: Här lever den konkreta integrationen med Whisper.net. Den hanterar laddning av modellfiler (.bin) och omvandlar råa ljudvågor till textsträngar med hjälp av lokal maskininlärning.
-Audio Capturing: Implementering av ljudströmning via NAudio. Det hanterar lågnivådetaljer som samplingshastighet (16kHz), buffertstorlekar och asynkron inläsning från ljudkortets WASAPI/ASIO-drivrutiner.
-Interop Logic: Innehåller bryggan (Native AOT / UnmanagedCallersOnly) som gör att ditt VST3-projekt (C++) kan kommunicera med .NET-logiken utan prestandaförlust.
-Persistence & Resources: Hantering av lokala resurser, såsom att strömma AI-modeller från disk till RAM på ett effektivt sätt.
+Contents:
+AI Engine Implementation: 
+This is where the concrete integration with Whisper.net lives. It handles loading model files (.bin) and converting raw audio waves to text strings using local machine learning.
+Audio Capturing: Implementation of audio streaming via NAudio. It handles low-level details such as sample rate (16kHz), buffer sizes and asynchronous loading from the sound card's WASAPI/ASIO drivers.
+Interop Logic: Contains the bridge (Native AOT / UnmanagedCallersOnly) that allows your VST3 project (C++) to communicate with the .NET logic without performance loss.
+Persistence & Resources: Management of local resources, such as efficiently streaming AI models from disk to RAM.

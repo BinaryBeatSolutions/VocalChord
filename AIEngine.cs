@@ -26,7 +26,9 @@ public class AIEngine
 
         Console.ForegroundColor = ConsoleColor.Yellow;
         Console.WriteLine("[BinaryBeat] Listening. Say a chord (for.eg. 'C Major')...");
-       
+
+        _midiService.Initialize();
+
         _liveCts = new CancellationTokenSource();
     }
 

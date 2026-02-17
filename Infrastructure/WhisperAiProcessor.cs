@@ -3,6 +3,9 @@ using Whisper.net.Ggml;
 
 namespace BinaryBeat.Infrastructure;
 
+/// <summary>
+/// Default speech recognition model
+/// </summary>
 public class WhisperAiProcessor : IAiProcessor, IDisposable
 {
     private WhisperFactory? _factory;
@@ -22,7 +25,7 @@ public class WhisperAiProcessor : IAiProcessor, IDisposable
     }
 
     /// <summary>
-    /// Initialize the engine and downloading the model if it not exists.
+    /// Initialize the engine and downloading the model if no model exist.
     /// </summary>
     public async Task InitializeAsync()
     {
