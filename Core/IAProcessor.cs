@@ -5,5 +5,7 @@ public record SpeechResult(string Text, float Confidence);
 public interface IAiProcessor
 {
     IAsyncEnumerable<SpeechResult> ProcessAudioAsync(byte[] pcmData, CancellationToken ct);
+
+    public Task InitializeAsync();
 }
 

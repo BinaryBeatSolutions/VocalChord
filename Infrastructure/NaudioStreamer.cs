@@ -4,7 +4,7 @@ namespace BinaryBeat.Infrastructure;
 
 public class NaudioStreamer : IAudioStreamer, IDisposable
 {
-    private WaveInEvent? _waveIn;
+    private WaveInEvent _waveIn;
     private readonly Channel<byte[]> _channel = Channel.CreateUnbounded<byte[]>();
 
     public async IAsyncEnumerable<byte[]> StreamAudioAsync([EnumeratorCancellation] CancellationToken ct)
@@ -27,10 +27,12 @@ public class NaudioStreamer : IAudioStreamer, IDisposable
         };
 
         waveIn.StartRecording();
+
         Console.WriteLine("[DEBUG] NAudio recording started...");
 
-        await foreach (var data in channel.Reader.ReadAllAsync(ct))
+        await foreach (var data in _channel.Reader.ReadAllAsync(ct).WithCancellation(ct))
         {
+            Console.WriteLine("DATA");
             yield return data;
         }
     }

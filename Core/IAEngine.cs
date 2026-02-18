@@ -6,8 +6,7 @@ using System.Threading.Tasks;
 
 namespace BinaryBeat.Core
 {
-    public interface IChordMapper
+    internal interface IAiEngine
     {
-        MusicalChord MapToChord(string input, float confidence);
     }
 }

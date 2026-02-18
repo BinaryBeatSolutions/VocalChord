@@ -8,8 +8,8 @@ namespace BinaryBeat.Infrastructure;
 /// </summary>
 public class WhisperAiProcessor : IAiProcessor, IDisposable
 {
-    private WhisperFactory? _factory;
-    private WhisperProcessor? _processor;
+    private WhisperFactory _factory;
+    private WhisperProcessor _processor;
     private readonly string _modelPath;
 
     // Default path om ingen anges
@@ -54,6 +54,7 @@ public class WhisperAiProcessor : IAiProcessor, IDisposable
             .WithBeamSearchSamplingStrategy()
             .ParentBuilder.Build();
 
+        Console.WriteLine($"[MODEL] {Path.GetFileName(_modelPath)}");
     }
 
     /// <summary>
@@ -65,7 +66,7 @@ public class WhisperAiProcessor : IAiProcessor, IDisposable
     /// <exception cref="InvalidOperationException"></exception>
     public async IAsyncEnumerable<SpeechResult> ProcessAudioAsync(byte[] pcmData, [EnumeratorCancellation] CancellationToken ct)
     {
-        if (_processor == null) throw new InvalidOperationException("[Debug] Processor not initialized.");
+        if (_processor == null) throw new InvalidOperationException("[DEBUG] Processor not initialized.");
 
         // Konvertera PCM (short) till float samples
         var samples = new float[pcmData.Length / 2];

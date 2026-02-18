@@ -1,29 +1,35 @@
-﻿
-using System.Drawing;
+﻿// Program.cs
+using static BinaryBeat.Infrastructure.Utils;
 
-var _modelpath = Utils.PathResolver.GetModelPath();
 var builder = Host.CreateApplicationBuilder(args);
 
-builder.Services.AddSingleton<IAiProcessor>(sp => new WhisperAiProcessor(_modelpath));
+builder.Services.AddSingleton<ChordMapper>();
+builder.Services.AddSingleton<MidiService>();
+builder.Services.AddTransient<IAiProcessor>(sp => new WhisperAiProcessor(PathResolver.GetModelPath()));
 builder.Services.AddSingleton<IAudioStreamer, NaudioStreamer>();
-builder.Services.AddSingleton<IChordMapper, ChordMapper>();
-builder.Services.AddSingleton<IMidiService, MidiService>();
+builder.Services.AddTransient<AiEngine>();
 
 using var host = builder.Build();
 
-var iAiProcessor = host.Services.GetRequiredService<IAiProcessor>() as WhisperAiProcessor;
-var iAudioStreamer = host.Services.GetRequiredService<IAudioStreamer>();
-var iChordMapper = host.Services.GetRequiredService<IChordMapper>();
-var iMidiService = host.Services.GetRequiredService<IMidiService>();
+var engine = host.Services.GetRequiredService<AiEngine>();
 
-//Start AI
-if (iAiProcessor != null)
-    await iAiProcessor.InitializeAsync();
+Console.WriteLine("--- BinaryBeat Solutions: VocalChord LIVE ---");
 
-Console.ForegroundColor = ConsoleColor.Yellow;
-Console.WriteLine("--- VocalChord by BinaryBeat Solutions---");
-Console.ForegroundColor = ConsoleColor.Green;
 
-await (new AIEngine(iAudioStreamer, iAiProcessor, iChordMapper, iMidiService).Listen());
+using var cts = new CancellationTokenSource();
 
-await host.RunAsync();
+// Hantera t.ex. CTRL+C för att stänga ner snyggt
+Console.CancelKeyPress += (s, e) => {
+    e.Cancel = true;
+    cts.Cancel();
+};
+
+try
+{
+    // Motorn sköter nu Capture och Analyze parallellt
+    await engine.RunAsync(cts.Token);
+}
+catch (OperationCanceledException)
+{
+    Console.WriteLine("\n[BinaryBeat] Engine stopped gracefully.");
+}

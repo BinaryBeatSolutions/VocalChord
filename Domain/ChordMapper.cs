@@ -11,7 +11,7 @@ public class ChordMapper : IChordMapper
         { "G Major", new[] { 55, 59, 62 } }
     };
 
-    public MusicalChord? MapToChord(string input, float confidence)
+    public MusicalChord MapToChord(string input, float confidence)
     {
         // Bibliotek med ackord (skulle kunna ligga i en JSON-fil senare) eller låta AI generera alla kombinationer
         var library = new Dictionary<string, int[]>
