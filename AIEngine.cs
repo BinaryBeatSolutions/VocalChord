@@ -1,10 +1,10 @@
-﻿using System.Threading.Channels;
+﻿using NAudio.Utils;
 
 namespace BinaryBeat.Infrastructure;
 
-public class AiEngine : IAiEngine
+public class AiEngine : IAEngine
 {
-    private readonly IAiProcessor _processor;
+    private readonly IAProcessor _processor;
     private readonly IAudioStreamer _streamer;
     private readonly ChordMapper _mapper;
     private readonly MidiService _midi;
@@ -12,7 +12,7 @@ public class AiEngine : IAiEngine
     // En kanal som fungerar som en trådsäker kö för ljud-chunks
     private readonly Channel<byte[]> _audioQueue = Channel.CreateUnbounded<byte[]>();
 
-    public AiEngine(IAiProcessor processor, IAudioStreamer streamer, ChordMapper mapper, MidiService midi)
+    public AiEngine(IAProcessor processor, IAudioStreamer streamer, ChordMapper mapper, MidiService midi)
     {
         _processor = processor;
         _streamer = streamer;
@@ -23,9 +23,9 @@ public class AiEngine : IAiEngine
     public async Task RunAsync(CancellationToken ct)
     {
         // 1. Initiera allt först
-        await _processor.InitializeAsync();
         _midi.Initialize();
-
+        await _processor.InitializeAsync();
+        
         // 2. Starta två parallella uppgifter
         // Task.Run ser till att de körs på egna trådar och inte blockerar varandra
         var captureTask = Task.Run(() => CaptureAudio(ct), ct);
@@ -52,20 +52,20 @@ public class AiEngine : IAiEngine
         await foreach (var chunk in _audioQueue.Reader.ReadAllAsync(ct))
         {
             pcmBuffer.AddRange(chunk);
-
-            if (pcmBuffer.Count >= 32000) // 1 sekund
+           
+            if (pcmBuffer.Count >= 48000) // 1.5sek
             {
                 var data = pcmBuffer.ToArray();
                 pcmBuffer.Clear();
-
+              
                 // Här kör vi AI:n utan att störa CaptureAudio-loopen
                 var results = await _processor.ProcessAudioAsync(data, ct).ToListAsync(ct);
 
-                if (results.Count > 0)
-                {
+                if (results.Any(r => !string.IsNullOrWhiteSpace(r.Text))) 
+                { 
                     var speech = results[0];
                     var detected = _mapper.MapToChord(speech.Text, speech.Confidence);
-
+                    Console.WriteLine(speech);
                     if (detected != null && (activeChord == null || activeChord.Name != detected.Name))
                     {
                         if (activeChord != null) _midi.SendChord(activeChord.MidiNotes, false);

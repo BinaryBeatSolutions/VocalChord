@@ -4,40 +4,43 @@ namespace BinaryBeat.Infrastructure;
 
 public class NaudioStreamer : IAudioStreamer, IDisposable
 {
-    private WaveInEvent _waveIn;
-    private readonly Channel<byte[]> _channel = Channel.CreateUnbounded<byte[]>();
+    private readonly WaveInEvent _waveIn;
 
     public async IAsyncEnumerable<byte[]> StreamAudioAsync([EnumeratorCancellation] CancellationToken ct)
     {
-        // WaveInEvent är för mikrofoner. 
-        // DeviceNumber 0 är oftast din standardmikrofon i Windows.
-        using var waveIn = new WaveInEvent
+        using var _waveIn = new WaveInEvent
         {
-            WaveFormat = new WaveFormat(16000, 16, 1),
-            BufferMilliseconds = 100 // Hur ofta den ska skicka data (lägre = snabbare)
+            WaveFormat = new WaveFormat(48000, 16, 1),
+            BufferMilliseconds = 1000 // Hur ofta den ska skicka data (lägre = snabbare)
         };
 
-        var channel = Channel.CreateUnbounded<byte[]>();
+        // WaveInEvent är för mikrofoner. 
+        // DeviceNumber 0 är oftast din standardmikrofon i Windows.
 
-        waveIn.DataAvailable += (s, e) =>
+
+        var _channel = Channel.CreateUnbounded<byte[]>();
+
+        _waveIn.DataAvailable += (s, e) =>
         {
             var buffer = new byte[e.BytesRecorded];
             Array.Copy(e.Buffer, buffer, e.BytesRecorded);
-            channel.Writer.TryWrite(buffer);
+            _channel.Writer.WriteAsync(buffer);
+            
         };
+       
+        Console.WriteLine(_waveIn.WaveFormat);
+        _waveIn.RecordingStopped += new EventHandler<StoppedEventArgs>(Stop);
+        _waveIn.StartRecording();
 
-        waveIn.StartRecording();
 
-        Console.WriteLine("[DEBUG] NAudio recording started...");
+        Console.WriteLine(Utils.APP_START_DEV_MESSAGE);
 
         await foreach (var data in _channel.Reader.ReadAllAsync(ct).WithCancellation(ct))
         {
-            Console.WriteLine("DATA");
             yield return data;
         }
     }
 
-
-    public void Stop() => _waveIn?.StopRecording();
+    public void Stop<StoppedEventArgs>(object o, StoppedEventArgs e) => _waveIn?.StopRecording();
     public void Dispose() => _waveIn?.Dispose();
 }

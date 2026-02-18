@@ -5,6 +5,14 @@
 /// </summary>
 public static class Utils
 {
+    public static string APP_NAME = "--- BinaryBeat Solutions: VocalChord LIVE ---";
+    
+    public static string APP_START_DEV_MESSAGE = "[DEBUG] NAudio recording started...";
+    
+    public static string APP_VERSION = "1.0";
+
+    public static string APP_DEFAULT_MODEL = "ggml-tiny.bin";
+
     /// <summary>
     /// Find model helper
     /// </summary>

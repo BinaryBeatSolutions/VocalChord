@@ -26,7 +26,6 @@
 	  <PackageReference Include="System.Linq.Async" Version="7.0.0" />
 	  <PackageReference Include="Whisper.net" Version="1.5.0" />
 	  <PackageReference Include="Whisper.net.Runtime" Version="1.5.0" />
-	  <!-- Fuzzy matching för att mappa "C major" till rätt logik -->
 	  <PackageReference Include="FuzzySharp" Version="2.0.2" /> 
 	  <PackageReference Include="NAudio" Version="2.2.1" />
   </ItemGroup>

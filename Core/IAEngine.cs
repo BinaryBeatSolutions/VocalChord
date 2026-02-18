@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace BinaryBeat.Core
 {
-    internal interface IAiEngine
+    internal interface IAEngine
     {
     }
 }

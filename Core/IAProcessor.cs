@@ -2,7 +2,7 @@
 
 public record SpeechResult(string Text, float Confidence);
 
-public interface IAiProcessor
+public interface IAProcessor
 {
     IAsyncEnumerable<SpeechResult> ProcessAudioAsync(byte[] pcmData, CancellationToken ct);
 

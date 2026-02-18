@@ -12,7 +12,7 @@ VocalHord is a plugin (VST3) for Abelton or other DAWs that allows you to create
 - **Deployment:** Compiled using **Native AOT** for minimal footprint and maximum performance in a production environment.
 - VocalChord utilizes quantized GGML models (Base/Tiny) to ensure high-performance inference on standard CPUs without requiring a dedicated GPU."
 
-# VocalHord Library
+# VocalChord Library
 A high-performance .NET 8 library for real-time AI voice-to-midi processing.
 
 ## Integration
