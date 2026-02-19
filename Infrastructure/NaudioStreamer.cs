@@ -14,8 +14,7 @@ public class NaudioStreamer : IAudioStreamer, IDisposable
         using (_waveIn = new WaveInEvent())
         {
             //_waveIn.DeviceNumber = 1;
-            WaveFormat format = new WaveFormat(16000, 16, 1);
-            _waveIn.WaveFormat = format;
+            _waveIn.WaveFormat = new WaveFormat(16000, 16, 1);
 
             _waveIn.DataAvailable += (s, e) =>
             {

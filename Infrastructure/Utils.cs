@@ -77,7 +77,7 @@ public static class Utils
 
 
         /// <summary>
-        /// 
+        /// Noise Gate, check for treshold. 
         /// </summary>
         /// <param name="buffer"></param>
         /// <param name="bytesRecorded"></param>
