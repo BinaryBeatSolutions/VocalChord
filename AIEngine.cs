@@ -43,7 +43,9 @@ public class AiEngine : IAEngine
 
             pcmBuffer.AddRange(chunk);
 
-            if (pcmBuffer.Count >= 32000) // 1 sek @ 16kHz
+            // Detect how long the sample is and only let it thrue if the sample is longer than 1 sec
+            //1 second sound = (16000 samples x 2 bytes x 1 kanal) = 32000 bytes.
+            if (pcmBuffer.Count >= 48000) // 1 sek @ 16kHz
             {
                 var data = pcmBuffer.ToArray();
                 pcmBuffer.Clear();

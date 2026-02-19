@@ -8,7 +8,9 @@ public class ChordMapper : IChordMapper
     {
         { "C Major", new[] { 60, 64, 67 } },
         { "A Minor", new[] { 57, 60, 64 } },
-        { "G Major", new[] { 55, 59, 62 } }
+        { "G Major", new[] { 55, 59, 62 } },
+        { "C Major 7", new[] { 60, 64, 67, 71 } },
+        { "C 7", new[] { 60, 64, 67, 70 } } // Dominant
     };
 
     public MusicalChord MapToChord(string input, float confidence)
@@ -18,7 +20,9 @@ public class ChordMapper : IChordMapper
         {
             { "C Major", [60, 64, 67] },
             { "A Minor", [57, 60, 64] },
-            { "G Major", [55, 59, 62] }
+            { "G Major", [55, 59, 62] },
+            { "C Major 7", new[] { 60, 64, 67, 71 } },
+            { "C 7", new[] { 60, 64, 67, 70 } } // Dominant
         };
 
         // FuzzySharp finds the best match

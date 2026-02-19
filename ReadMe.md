@@ -11,6 +11,9 @@ VocalHord is a plugin (VST3) for Abelton or other DAWs that allows you to create
 - **Pattern Matching:** Fuzzy logic implementation to map natural language to musical theory (Chords).
 - **Deployment:** Compiled using **Native AOT** for minimal footprint and maximum performance in a production environment.
 - VocalChord utilizes quantized GGML models (Base/Tiny) to ensure high-performance inference on standard CPUs without requiring a dedicated GPU."
+- The engine utilizes a 1500ms buffer window (48,000 bytes @ 16kHz/16-bit) to prioritize maximum AI inference accuracy. 
+- This extended phonetic context ensures 100% reliable chord detection for complex musical terminology, providing a stable foundation for professional DAW workflows.
+
 
 # VocalChord library
 A high-performance .NET 8 library for real-time AI voice-to-midi processing.

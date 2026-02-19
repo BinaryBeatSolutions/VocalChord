@@ -6,15 +6,12 @@ namespace BinaryBeat.Infrastructure;
 
 internal static class Configuration
 {
+    //Temp variables for test
     internal static string APP_NAME = "--- BinaryBeat Solutions: VocalChord LIVE ---";
 
     internal static string APP_START_DEV_MESSAGE = "[DEBUG] NAudio recording started...";
 
     internal static string APP_VERSION = "1.0";
-
-    internal static readonly string APP_DEFAULT_MODEL = "ggml-tiny.bin";
-
-    internal static readonly string APP_MODEL_EN = "ggml-tiny.en.bin";
 
     /// <summary>
     /// Microphone Threshold. 
@@ -22,6 +19,16 @@ internal static class Configuration
     /// Adjustable so you dont have to shout into the mic.
     /// </summary>
     internal static double NOISE_GATE_TRESHOLD = 0.001;
+    
+    /// <summary>
+    /// All languages
+    /// </summary>
+    internal static readonly string APP_DEFAULT_MODEL = "ggml-tiny.bin";
+
+    /// <summary>
+    /// English 
+    /// </summary>
+    internal static readonly string APP_MODEL_EN = "ggml-tiny.en.bin";
 }
 
 /// <summary>
@@ -110,10 +117,10 @@ public static class Utils
         /// <param name="bytesRecorded"></param>
         /// <param name="noiseThreshold"></param>
         /// <returns></returns>
-        public static bool IsSilence(byte[] buffer, int bytesRecorded, double noiseThreshold = 0.0)
+        public static bool IsSilence(byte[] buffer, int bytesRecorded, double noiseThreshold = default)
         {
-            if(noiseThreshold > 0.0)
-               Configuration.NOISE_GATE_TRESHOLD = noiseThreshold;
+            if(noiseThreshold == default)
+               Configuration.NOISE_GATE_TRESHOLD = noiseThreshold; //<--- TODO: Check that it's acually contains a double value
 
             return NoiseGate(buffer, bytesRecorded);
         }
