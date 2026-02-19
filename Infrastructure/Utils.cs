@@ -17,11 +17,11 @@ internal static class Configuration
     internal static readonly string APP_MODEL_EN = "ggml-tiny.en.bin";
 
     /// <summary>
-    /// Tröskelvärde (Threshold). 
-    /// 0.01 är ca -40dB. Prata in i micken och se om det triggar.
-    /// Om AI:n missar när du pratar svagt, sänk till 0.005.
+    /// Microphone Threshold. 
+    /// 0.01 is around -40dB. Talk into the mic and see what value is the trigger.
+    /// Adjustable so you dont have to shout into the mic.
     /// </summary>
-    internal static readonly double NOISE_GATE_TRESHOLD = 0.001;
+    internal static double NOISE_GATE_TRESHOLD = 0.001;
 }
 
 /// <summary>
@@ -45,19 +45,19 @@ public static class Utils
             string baseDir = AppContext.BaseDirectory;
 
             // Debug (Visual Studio), back up to projectroot to keep everything simple and close.
-            #if DEBUG
-                    string projectRoot = Path.GetFullPath(Path.Combine(baseDir, @"..\..\..\..\")); //Microsoft!!! Still after all these years.
-                    string path = Path.Combine(projectRoot, "Models", Configuration.APP_MODEL_EN);
-            #else
+#if DEBUG
+            string projectRoot = Path.GetFullPath(Path.Combine(baseDir, @"..\..\..\..\")); //Microsoft!!! Still after all these years.
+            string path = Path.Combine(projectRoot, "Models", Configuration.APP_MODEL_EN);
+#else
                     string path = Path.Combine(baseDir, "Models", modelName);
-            #endif
+#endif
 
             return path;
         }
     }
 
-    public static class AudioUtils 
-    { 
+    public static class AudioUtils
+    {
         /// <summary>
         /// Calculate RMS value
         /// </summary>
@@ -103,8 +103,11 @@ public static class Utils
             return rms < Configuration.NOISE_GATE_TRESHOLD;
         }
 
-        public static bool IsSilence(byte[] buffer, int bytesRecorded, double noiseThreshold = 0)
+        public static bool IsSilence(byte[] buffer, int bytesRecorded, double noiseThreshold = 0.0)
         {
+            if (noiseThreshold > 0.0)
+                Configuration.NOISE_GATE_TRESHOLD = noiseThreshold;
+
             return NoiseGate(buffer, bytesRecorded);
         }
     }
