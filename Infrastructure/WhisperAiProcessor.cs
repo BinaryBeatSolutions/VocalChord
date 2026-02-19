@@ -47,10 +47,7 @@ public class WhisperAiProcessor : IAProcessor, IDisposable
         _factory = WhisperFactory.FromPath(_modelPath);
         _processor = _factory.CreateBuilder()
         .WithLanguage("en") // Eller AutoDetectLanguage() för att låta modellen gissa språket. Det finns lite olika strategier för att styra språket.
-            .WithThreads(Environment.ProcessorCount)
-            .WithEntropyThreshold(0.1f)
-            .WithBeamSearchSamplingStrategy()
-            .ParentBuilder.Build();
+        .Build();
 #if DEBUG
         Console.WriteLine($"[MODEL] {Path.GetFileName(_modelPath)}");
 #endif

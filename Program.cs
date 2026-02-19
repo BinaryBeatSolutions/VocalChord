@@ -13,4 +13,3 @@ using var host = builder.Build();
 var engine = host.Services.GetRequiredService<AiEngine>();
 
 await engine.RunAsync();
-await host.RunAsync();

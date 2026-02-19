@@ -8,5 +8,6 @@ namespace BinaryBeat.Core
 {
     internal interface IAEngine
     {
+        Task RunAsync();
     }
 }

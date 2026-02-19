@@ -45,19 +45,19 @@ public static class Utils
             string baseDir = AppContext.BaseDirectory;
 
             // Debug (Visual Studio), back up to projectroot to keep everything simple and close.
-            #if DEBUG
-                    string projectRoot = Path.GetFullPath(Path.Combine(baseDir, @"..\..\..\..\")); //Microsoft!!! Still after all these years.
-                    string path = Path.Combine(projectRoot, "Models", Configuration.APP_MODEL_EN);
-            #else
+#if DEBUG
+            string projectRoot = Path.GetFullPath(Path.Combine(baseDir, @"..\..\..\..\")); //Microsoft!!! Still after all these years.
+            string path = Path.Combine(projectRoot, "Models", Configuration.APP_MODEL_EN);
+#else
                     string path = Path.Combine(baseDir, "Models", modelName);
-            #endif
+#endif
 
             return path;
         }
     }
 
-    public static class AudioUtils 
-    { 
+    public static class AudioUtils
+    {
         /// <summary>
         /// Calculate RMS value
         /// </summary>
@@ -77,7 +77,7 @@ public static class Utils
 
 
         /// <summary>
-        /// 
+        /// Noise Gate middle layer, check for treshold. 
         /// </summary>
         /// <param name="buffer"></param>
         /// <param name="bytesRecorded"></param>
@@ -103,10 +103,17 @@ public static class Utils
             return rms < Configuration.NOISE_GATE_TRESHOLD;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="buffer"></param>
+        /// <param name="bytesRecorded"></param>
+        /// <param name="noiseThreshold"></param>
+        /// <returns></returns>
         public static bool IsSilence(byte[] buffer, int bytesRecorded, double noiseThreshold = 0.0)
         {
             if(noiseThreshold > 0.0)
-                Configuration.NOISE_GATE_TRESHOLD = noiseThreshold;
+               Configuration.NOISE_GATE_TRESHOLD = noiseThreshold;
 
             return NoiseGate(buffer, bytesRecorded);
         }
