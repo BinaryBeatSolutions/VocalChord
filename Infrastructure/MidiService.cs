@@ -9,6 +9,8 @@ public class MidiService : IMidiService, IDisposable
     private OutputDevice _outputDevice;
     private readonly string _portName = "BinaryBeat MIDI Out";
 
+    public MusicalChord ActiveChord { get; set; } = null;
+
     public void Initialize()
     {
         // Vi letar specifikt efter porten i loopMIDI
@@ -38,6 +40,13 @@ public class MidiService : IMidiService, IDisposable
             _outputDevice.SendEvent(midiEvent);
         }
     }
+    public void SendNoteOff(int[] notes)
+    {
 
-    public void Dispose() => _outputDevice?.Dispose();
+    }
+
+    public void Dispose() => _outputDevice?.Dispose(); 
+
+
+
 }

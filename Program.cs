@@ -10,8 +10,7 @@ builder.Services.AddSingleton<IAudioStreamer, NaudioStreamer>();
 builder.Services.AddTransient<AiEngine>();
 
 using var host = builder.Build();
-
 var engine = host.Services.GetRequiredService<AiEngine>();
 
-using var cts = new CancellationTokenSource();
-await engine.RunAsync(cts.Token);
+await engine.RunAsync();
+await host.RunAsync();

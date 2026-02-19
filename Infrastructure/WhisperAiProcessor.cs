@@ -12,16 +12,13 @@ public class WhisperAiProcessor : IAProcessor, IDisposable
     private WhisperProcessor _processor;
     private readonly string _modelPath;
 
-    // Default path if not provided
-    private static readonly string DefaultModelPath = "ggml-tiny.bin";
-
     /// <summary>
     /// Ctor
     /// </summary>
     /// <param name="customModelPath"></param>
     public WhisperAiProcessor(string? customModelPath = null)
     {
-        _modelPath = customModelPath ?? DefaultModelPath;
+        _modelPath = customModelPath ?? Utils.PathResolver.GetModelPath();
     }
 
     /// <summary>
@@ -51,7 +48,6 @@ public class WhisperAiProcessor : IAProcessor, IDisposable
         _processor = _factory.CreateBuilder()
         .WithLanguage("en") // Eller AutoDetectLanguage() för att låta modellen gissa språket. Det finns lite olika strategier för att styra språket.
             .WithThreads(Environment.ProcessorCount)
-            .WithPrompt("C Major, A Minor")
             .WithEntropyThreshold(0.1f)
             .WithBeamSearchSamplingStrategy()
             .ParentBuilder.Build();
@@ -69,40 +65,20 @@ public class WhisperAiProcessor : IAProcessor, IDisposable
     /// <exception cref="InvalidOperationException"></exception>
     public async IAsyncEnumerable<SpeechResult> ProcessAudioAsync(byte[] pcmData, [EnumeratorCancellation] CancellationToken ct)
     {
+        if (_processor == null) throw new InvalidOperationException("[DEBUG] Processor not initialized.");
 
+        // Konvertera PCM (short) till float samples
         var samples = new float[pcmData.Length / 2];
-
-        if (Math.Abs(samples[0]) > 0.01f) // Har vi något ljud överhuvudtaget?
+        for (int n = 0; n < samples.Length; n++)
         {
-            // Om detta aldrig triggas får programmet bara tystnad från mikrofonen
-       
-            for (int n = 0; n < samples.Length; n++)
-            {
-                // Tolka två bytes som en 16-bitars short och normalisera till float (-1.0 till 1.0)
-                short sample = BitConverter.ToInt16(pcmData, n * 2);
-                samples[n] = sample / 32768.0f;
-            }
-
-            // NU skickar vi den fyllda arrayen till AI:n
-            await foreach (var segment in _processor.ProcessAsync(samples, ct))
-            {
-                yield return new SpeechResult(segment.Text.Trim(), segment.Probability);
-            }
+            short sample = BitConverter.ToInt16(pcmData, n * 2);
+            samples[n] = sample / 32768.0f;
         }
-        //if (_processor == null) throw new InvalidOperationException("[DEBUG] Processor not initialized.");
 
-        //// Konvertera PCM (short) till float samples
-        //var samples = new float[pcmData.Length / 2];
-        //for (int n = 0; n < samples.Length; n++)
-        //{
-        //    short sample = BitConverter.ToInt16(pcmData, n * 2);
-        //    samples[n] = sample / 32768.0f;
-        //}
-
-        //await foreach (var segment in _processor.ProcessAsync(samples, ct))
-        //{
-        //    yield return new SpeechResult(segment.Text.Trim(), segment.Probability);
-        //}
+        await foreach (var segment in _processor.ProcessAsync(samples, ct))
+        {
+            yield return new SpeechResult(segment.Text.Trim(), segment.Probability);
+        }
     }
 
     /// <summary>

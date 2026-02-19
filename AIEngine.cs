@@ -1,5 +1,7 @@
 ﻿using NAudio.Utils;
 
+using static BinaryBeat.Infrastructure.Utils.AudioUtils;
+
 namespace BinaryBeat.Infrastructure;
 
 public class AiEngine : IAEngine
@@ -20,64 +22,65 @@ public class AiEngine : IAEngine
         _midi = midi;
     }
 
-    public async Task RunAsync(CancellationToken ct)
+    public async Task RunAsync()
     {
-        // 1. Initiera allt först
         _midi.Initialize();
-        await _processor.InitializeAsync();
-        
-        // 2. Starta två parallella uppgifter
-        // Task.Run ser till att de körs på egna trådar och inte blockerar varandra
-        var captureTask = Task.Run(() => CaptureAudio(ct), ct);
-        var analyzeTask = Task.Run(() => AnalyzeAudio(ct), ct);
 
-        await Task.WhenAll(captureTask, analyzeTask);
-    }
-
-    private async Task CaptureAudio(CancellationToken ct)
-    {
-        // Denna loop gör BARA en sak: Hämtar ljud och lägger i kön
-        await foreach (var chunk in _streamer.StreamAudioAsync(ct))
+        if (_processor != null)
         {
-            await _audioQueue.Writer.WriteAsync(chunk, ct);
+            await _processor.InitializeAsync();
         }
-    }
 
-    private async Task AnalyzeAudio(CancellationToken ct)
-    {
-        List<byte> pcmBuffer = new();
-        MusicalChord? activeChord = null;
+        Console.WriteLine(">>> BinaryBeat lyssnar nu. Säg ett ackord (t.ex. 'C Major')...");
 
-        // Denna loop plockar från kön så fort det finns data
-        await foreach (var chunk in _audioQueue.Reader.ReadAllAsync(ct))
+        using var liveCts = new CancellationTokenSource();
+
+        var pcmBuffer = new List<byte>();
+
+        MusicalChord lastChord = null;
+
+        await foreach (var audioChunk in _streamer.StreamAudioAsync(liveCts.Token))
         {
-            pcmBuffer.AddRange(chunk);
-           
-            if (pcmBuffer.Count >= 48000) // 1.5sek
-            {
-                var data = pcmBuffer.ToArray();
-                pcmBuffer.Clear();
-              
-                // Här kör vi AI:n utan att störa CaptureAudio-loopen
-                var results = await _processor.ProcessAudioAsync(data, ct).ToListAsync(ct);
+            pcmBuffer.AddRange(audioChunk);
 
-                if (results.Any(r => !string.IsNullOrWhiteSpace(r.Text))) 
-                { 
-                    var speech = results[0];
-                    var detected = _mapper.MapToChord(speech.Text, speech.Confidence);
-                    Console.WriteLine(speech);
-                    if (detected != null && (activeChord == null || activeChord.Name != detected.Name))
+            if (pcmBuffer.Count >= 48000)
+            {
+                var rawData = pcmBuffer.ToArray();
+                pcmBuffer.Clear();
+
+                var results = await _processor.ProcessAudioAsync(rawData, liveCts.Token).ToListAsync();
+
+                Console.WriteLine($"[BinaryBeat] RMS: {CalculateRMS(rawData)}");
+
+                if (results.Any())
+                {
+                    var speech = results.First();
+                    var currentChord = _mapper.MapToChord(speech.Text, speech.Confidence);
+                    var activeChord = _midi.ActiveChord;
+
+                    if (currentChord != null && (activeChord == null || activeChord.Name != currentChord.Name))
                     {
-                        if (activeChord != null) _midi.SendChord(activeChord.MidiNotes, false);
-                        _midi.SendChord(detected.MidiNotes, true);
-                        activeChord = detected;
-                        Console.WriteLine($"[MATCH] {detected.Name}");
+
+                        // 1. Stoppa föregående ackord
+                        if (activeChord != null)
+                            _midi.SendChord(activeChord.MidiNotes, false);
+
+                        // 2. Starta det nya
+                        _midi.SendChord(currentChord.MidiNotes, true);
+                        _midi.ActiveChord = currentChord;
+
+                        Console.WriteLine($"[MIDI] Playing {currentChord.Name}");
                     }
                 }
-                else if (activeChord != null)
+                else
                 {
-                    _midi.SendChord(activeChord.MidiNotes, false);
-                    activeChord = null;
+                    // AI:n hörde ingenting (tystnad) -> Återställ!
+                    if (lastChord != null)
+                    {
+                        Console.WriteLine("[IDLE] No speech detected - Resetting.");
+                        _midi.SendNoteOff(lastChord.MidiNotes);
+                        lastChord = null;
+                    }
                 }
             }
         }
